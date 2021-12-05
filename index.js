@@ -6,15 +6,24 @@ const { MongoClient } = require('mongodb');
 const port =process.env.port || 5000;
 
 app.use(cors());
+app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.0kwkb.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-console.log(uri);
+
 
 async function run(){
      try{
         await client.connect();
-        console.log('Database connected successfully');
+        const database=client.db('doctors_portal');
+        const appointmentsCollection=database.collection('appointments');
+
+        app.post('/appointments',async(req,res)=>{
+          const appointment=req.body;
+          const result=await appointmentsCollection.insertOne(appointment);
+          console.log(result);
+          res.json(result)
+        })
      }
      finally{
           
