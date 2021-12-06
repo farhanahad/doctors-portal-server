@@ -3,14 +3,15 @@ const app = express()
 const cors=require('cors');
 require('dotenv').config();
 const { MongoClient } = require('mongodb');
-const port =process.env.port || 5000;
+const ObjectId = require('mongodb').ObjectId;
+const port =process.env.PORT||5000;
 
 app.use(cors());
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.0kwkb.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-
+console.log(uri);
 
 async function run(){
      try{
@@ -46,6 +47,13 @@ async function run(){
           }
           res.json({ admin: isAdmin });
       })
+
+      app.get('/appointments/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const result = await appointmentsCollection.findOne(query);
+        res.json(result);
+    })
       
         app.post('/users',async(req,res)=>{
           const user=req.body;
